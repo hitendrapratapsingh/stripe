@@ -1,0 +1,34 @@
+Webhooks:-
+# Setting up a webhook endpoint to receive events from Stripe
+Go to Stripe Dashboard → Developers → Webhooks
+
+Link: https://dashboard.stripe.com/test/webhooks
+
+https://abcd1234.ngrok.io/webhook
+
+
+Under Events to send, you can select specific ones like:
+
+payment_intent.succeeded
+
+payment_intent.payment_failed
+
+charge.succeeded
+(Or just "Send all events" for testing.)
+
+Click “Add endpoint”
+
+
+For Webhook you can download and install from https://docs.stripe.com/stripe-cli/install
+
+Then run the following command in terminal to forward events to your local server:
+
+
+Run : ngrok http 4242
+
+
+
+
+
+
+

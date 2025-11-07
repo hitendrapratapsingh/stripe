@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Stripe Payment Demo</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+  <h2>Pay (demo)</h2>
+  <label>Amount (in cents): <input id="amount" type="number" value="5000" /></label>
+  <div id="card-element"></div>
+  <button id="pay">Pay</button>
+  <div id="message"></div>
+
+  <script>
+    async function init() {
+      const { publishableKey } = await fetch("/config").then(r => r.json());
+      const stripe = Stripe(publishableKey);
+
+      const elements = stripe.elements();
+      const card = elements.create("card");
+      card.mount("#card-element");
+
+      document.getElementById("pay").addEventListener("click", async () => {
+        const amount = document.getElementById("amount").value || 5000;
+
+        const resp = await fetch("/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount })
+        });
+        const data = await resp.json();
+
+        const result = await stripe.confirmCardPayment(data.clientSecret, {
+          payment_method: { card }
+        });
+
+        if (result.error) {
+          document.getElementById("message").textContent = "❌ " + result.error.message;
+        } else if (result.paymentIntent.status === "succeeded") {
+          document.getElementById("message").textContent = "✅ Payment succeeded!";
+        }
+      });
+    }
+
+    window.addEventListener("load", init);
+  </script>
+</body>
+</html>

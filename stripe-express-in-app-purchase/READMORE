@@ -1,0 +1,97 @@
+
+
+#
+API Name
+Purpose
+Example Endpoint
+1️⃣
+Create Product
+Theatre plans (Gold, Silver, Platinum)
+POST /api/products
+2️⃣
+Create Price (Recurring)
+Define billing (amount, interval, currency)
+POST /api/prices
+3️⃣
+Create Checkout Session
+Redirect users to Stripe checkout to pay
+POST /create-checkout-session
+4️⃣
+Webhook Listener
+Receive Stripe events (subscription created, renewed, cancelled, payment failed)
+POST /webhook
+5️⃣
+Get Subscription Details
+Fetch user’s active subscriptions from Stripe
+GET /api/subscriptions/:customer_id
+6️⃣
+Cancel Subscription
+Allow users to cancel
+POST /api/subscription/cancel/:subscription_id
+7️⃣
+Retrieve Product & Price Info
+Show available plans
+GET /api/products and GET /api/products/:id/prices
+
+
+
+
+curl --location 'http://localhost:4242/create-product' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Theatre Gold Plan",
+  "description": "Monthly theatre subscription with premium benefits",
+  "amount": 4999,
+  "currency": "usd",
+  "interval": "month",
+  "interval_count": 1,
+  "billing_period": "Monthly"
+}'
+
+
+curl --location 'https://api.stripe.com/v1/customers' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--header 'Authorization: Basic c2tfdGVzdF81MU1TSG9wRWVCS0x5NVIxnlXYkluZGhHeU92cVNjaHIwYjlYd09HQWY6' \
+--data-urlencode 'email=hitendra.suntec@gmail.com' \
+--data-urlencode 'name=Hitendra' \
+--data-urlencode 'phone= 7503316422' \
+--data-urlencode 'description=New Customer for hitendra.suntec@gmail.com'
+
+
+curl --location 'http://localhost:4242/api/products/prod_TMqWNZobYgFzIB' \
+--header 'Content-Type: application/json' \
+--data '{
+  "name": "Theatre Gold Premium Plan",
+  "description": "Updated monthly subscription plan",
+  "active": true
+}'
+
+
+curl --location 'http://localhost:4242/api/products/prod_TMqWNZobYgFzIB'
+
+curl --location 'http://localhost:4242/api/products?limit=10'
+
+
+curl --location 'http://localhost:4242/api/prices' \
+--header 'Content-Type: application/json' \
+--data '{
+  "product": "prod_TMqWNZobYgFzIB",
+  "unit_amount": 49999,
+  "currency": "usd",
+  "recurring": {
+    "interval": "month",
+    "interval_count": 1
+  }
+}'
+
+curl --location 'http://localhost:4242/api/prices/price_1SQ6yoRuh3iKj2F0pejLnfW1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "nickname": "Gold Plan Monthly",
+    "metadata": {
+        "tier": "gold",
+        "type": "subscription"
+    }
+}'
+
+curl --location 'http://localhost:4242/api/products/prod_TMqWNZobYgFzIB/prices'

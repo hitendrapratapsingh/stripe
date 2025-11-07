@@ -1,0 +1,48 @@
+
+
+STRIPE SUBSCRIPTION FLOW — COMPLETE IMPLEMENTATION (Node.js + Express)
+
+| Function          | Method   | Endpoint                     | Body                                                                                           |
+| ----------------- | -------- | ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| Create Customer   | `POST`   | `/create-customer`           | `{ "email": "user@test.com", "name": "John" }`                                                 |
+| Create Checkout   | `POST`   | `/create-checkout-session`   | `{ "customerId": "cus_xxx", "priceId": "price_xxx", "successUrl": "...", "cancelUrl": "..." }` |
+| Get Subscriptions | `GET`    | `/subscription/:customerId`  | —                                                                                              |
+| Upgrade/Downgrade | `POST`   | `/subscription/update`       | `{ "subscriptionId": "sub_xxx", "newPriceId": "price_new" }`                                   |
+| Cancel Now        | `DELETE` | `/subscription/:id`          | —                                                                                              |
+| Cancel Later      | `POST`   | `/subscription/cancel-later` | `{ "subscriptionId": "sub_xxx" }`                                                              |
+| Resume            | `POST`   | `/subscription/resume`       | `{ "subscriptionId": "sub_xxx" }`                                                              |
+
+
+
+curl --location 'http://localhost:4242/create-customer' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+  "email": "testuser@example.com",
+  "name": "John Doe"
+}'
+
+
+curl --location 'http://localhost:4242/create-checkout-session' \
+--header 'Content-Type: application/json' \
+--data '{
+  "customerId": "cus_TNTeob40MmWs1G",
+  "priceId": "price_1SQ6yoRuh3iKj2F0pejLnfW1",
+  "successUrl": "https://example.com/success",
+  "cancelUrl": "https://example.com/cancel"
+}'
+
+
+Step 3: Webhook (automatic)
+
+stripe listen --forward-to localhost:4242/webhook
+
+You’ll see logs for:
+
+customer.subscription.created
+
+invoice.payment_succeeded
+
+customer.subscription.deleted
+
+
+curl --location 'http://localhost:4242/subscription/cus_TNTeob40MmWs1G'
